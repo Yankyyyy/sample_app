@@ -14,11 +14,15 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sample_app/css/sample_app.css"
+app_include_css = "/assets/sample_app/css/sample_app.css"
 # app_include_js = "/assets/sample_app/js/sample_app.js"
+app_include_js = "/assets/sample_app/js/sample_app.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/sample_app/css/sample_app.css"
+web_include_css = "/assets/sample_app/css/sample_app.css"
 # web_include_js = "/assets/sample_app/js/sample_app.js"
+web_include_js = "/assets/sample_app/js/sample_app.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "sample_app/public/scss/website"
@@ -97,6 +101,20 @@ app_license = "MIT"
 #	}
 # }
 
+doc_events = {
+	"YankyDT": {
+		"before_save": "sample_app.fixtures.PersonalScripts.trial.trial1",  
+		"after_save": "sample_app.API.SOAP_API_test.print_label",
+  		"onload": "sample_app.API.SOAP_API.cancel_pickup"
+	},
+	"Sales Invoice": {
+		"onload": "sample_app.API.CreateShipmentsAPI.create_shipments"
+	},
+	"Shipment": {
+		"onload": "sample_app.API.TrackShipmentsAPI.track_shipments"
+	}
+}
+
 # Scheduled Tasks
 # ---------------
 
@@ -172,4 +190,4 @@ user_data_fields = [
 # auth_hooks = [
 # 	"sample_app.auth.validate"
 # ]
-
+fixtures = ["Custom Field"]

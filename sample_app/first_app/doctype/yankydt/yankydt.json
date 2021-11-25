@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "autoname": "field:first",
+ "creation": "2021-09-01 10:35:48.767469",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "first",
+  "dob",
+  "gender",
+  "contact",
+  "age",
+  "last_name",
+  "p_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "first",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "F_Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Gender",
+   "options": "\nMale\nFemale\nOthers",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Contact",
+   "length": 10,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "DoB",
+   "reqd": 1
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "hide_seconds": 1,
+   "in_list_view": 1,
+   "label": "Age"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "L_Name",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "p_date",
+   "fieldtype": "Date",
+   "label": "Present_Date",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-06 15:06:17.215587",
+ "modified_by": "Administrator",
+ "module": "first_app",
+ "name": "YankyDT",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

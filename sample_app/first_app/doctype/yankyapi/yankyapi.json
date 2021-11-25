@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "allow_events_in_timeline": 1,
+ "allow_import": 1,
+ "autoname": "field:full_name",
+ "creation": "2021-09-15 10:30:38.426793",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "full_name",
+  "gender",
+  "company",
+  "designation",
+  "email_id",
+  "contact_no",
+  "address_info",
+  "address_html",
+  "address_type",
+  "address_line1",
+  "city",
+  "state",
+  "country",
+  "pincode"
+ ],
+ "fields": [
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "contact_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Contact Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Company"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "label": "Email ID",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fetch_from": "address_line1.city",
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City/Town",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type"
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fetch_from": "address_line1.country",
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type",
+   "options": "Country"
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fetch_from": "address_line1.address_line1",
+   "fieldname": "address_line1",
+   "fieldtype": "Link",
+   "label": "Address",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type",
+   "options": "Address"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Link",
+   "label": "Gender",
+   "options": "Gender",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval: doc.__islocal",
+   "fieldname": "address_info",
+   "fieldtype": "Section Break",
+   "label": "Address"
+  },
+  {
+   "fieldname": "address_html",
+   "fieldtype": "HTML",
+   "label": "Address HTML",
+   "options": "{{doc.address_line1}},<br>{{doc.city}}, {{doc.state}}, {{doc.country}}<br>Pin Code - {{doc.pincode}}",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fieldname": "address_type",
+   "fieldtype": "Select",
+   "label": "Address Type",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type",
+   "options": "Shipping\nBilling\nOffice\nPersonal\nPlant\nPostal\nShop\nSubsidiary\nWarehouse\nCurrent\nPermanent\nOther"
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type"
+  },
+  {
+   "depends_on": "eval: doc.__islocal",
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Postal Code",
+   "mandatory_depends_on": "eval: doc.address_title && doc.address_type"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-21 12:10:40.688641",
+ "modified_by": "Administrator",
+ "module": "first_app",
+ "name": "YankyAPI",
+ "name_case": "Title Case",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

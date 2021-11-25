@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "autoname": "field:first_name",
+ "creation": "2021-09-03 14:31:15.616219",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "first_name",
+  "last_name",
+  "dob",
+  "age",
+  "yanky_c_t"
+ ],
+ "fields": [
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Link",
+   "label": "First_Name",
+   "options": "YankyDT",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fetch_from": "first_name.last_name",
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last_name"
+  },
+  {
+   "fetch_from": "first_name.dob",
+   "fieldname": "dob",
+   "fieldtype": "Date",
+   "label": "DoB"
+  },
+  {
+   "fetch_from": "first_name.age",
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "label": "Age"
+  },
+  {
+   "fieldname": "yanky_c_t",
+   "fieldtype": "Table",
+   "label": "Yanky_C_T",
+   "options": "Yanky_C_T"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-13 10:16:24.893633",
+ "modified_by": "Administrator",
+ "module": "first_app",
+ "name": "YankyDT_N",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
