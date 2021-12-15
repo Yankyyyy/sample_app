@@ -1,0 +1,229 @@
+List<ShipmentItem> _Items = new List<ShipmentItem>();
+    Shipment _Shipment = new Shipment();
+    //DeliveryNoteDetail CODItem = itmList.Where(itm => itm.ItemCode.ToUpper() == "COD").FirstOrDefault();
+    try
+    {
+    
+    
+    
+    
+    #region Shipment
+    
+    
+    
+    #region Shipper
+    _Shipment.Shipper = new Party
+    {
+    Reference1 = dn.SalesOrderID,
+    Reference2 = dn.SalesInvoiceID ?? "",
+    AccountNumber = System.Configuration.ConfigurationManager.AppSettings["ShipperAccountNumber"],// "4004636";
+    
+    
+    
+    PartyAddress = new Address
+    {
+    Line1 = CompanyInfo.Address_Line1,
+    Line2 = CompanyInfo.Address_Line2,//StockOne
+    Line3 = dn.WarehouseName,//Stock Hammad
+    City = CompanyInfo.City_Name_EN,
+    StateOrProvinceCode = string.Empty,
+    PostCode = CompanyInfo.PoBox,
+    CountryCode = "SA"
+    },
+    
+    
+    
+    Contact = new Contact
+    {
+    Department = string.Empty,
+    PersonName = dn.PersonName,//Ahmed
+    Title = string.Empty,
+    CompanyName = CompanyInfo.Company_Name_EN,
+    PhoneNumber1 = dn.PersonPhone,
+    PhoneNumber1Ext = string.Empty,
+    PhoneNumber2 = string.Empty,
+    PhoneNumber2Ext = string.Empty,
+    FaxNumber = string.Empty,
+    CellPhone = dn.PersonPhone,
+    EmailAddress = dn.PersonEmail,
+    Type = string.Empty
+    }
+    };
+    
+    
+    
+    
+    
+    #endregion
+    
+    
+    
+    #region Consignee
+    _Shipment.Consignee = new Party
+    {
+    Reference1 = dn.ReferenceNo,//36
+    Reference2 = string.Empty,
+    AccountNumber = System.Configuration.ConfigurationManager.AppSettings["ConsigneeAccountNumber"], //"4004636";
+    
+    
+    
+    PartyAddress = new Address()
+    };
+    Select_AramexCountryCodeResult lstAramexCountry = new Select_AramexCountryCodeResult();
+    lstAramexCountry = DeliveryNoteServices.GetAramexCountry(Convert.ToInt32(dn.Country)).FirstOrDefault();
+    _Shipment.Consignee.PartyAddress.Line1 = dn.Address;//wwwwwww
+    _Shipment.Consignee.PartyAddress.Line2 = dn.Address1;//wwwwwww
+    _Shipment.Consignee.PartyAddress.Line3 = lstAramexCountry.Country_Name_EN ?? "";// "Saudi Arabia";//1
+    _Shipment.Consignee.PartyAddress.City = dn.City;
+    _Shipment.Consignee.PartyAddress.StateOrProvinceCode = string.Empty;
+    _Shipment.Consignee.PartyAddress.PostCode = string.Empty;
+    _Shipment.Consignee.PartyAddress.CountryCode = lstAramexCountry.AramexCountryCode ?? "";// "SA";
+    
+    
+    
+    string customerName = (dn.FirstName + " " + dn.LastName);
+    if (customerName.Length > 50)
+    customerName = customerName.Substring(1, 50);
+    
+    
+    
+    _Shipment.Consignee.Contact = new Contact
+    {
+    Department = string.Empty,
+    PersonName = customerName,//TALHA Co
+    Title = string.Empty,
+    CompanyName = customerName,
+    PhoneNumber1 = dn.Phone,//4234
+    PhoneNumber1Ext = string.Empty,
+    PhoneNumber2 = string.Empty,
+    PhoneNumber2Ext = string.Empty,
+    FaxNumber = string.Empty,
+    CellPhone = dn.Phone,
+    EmailAddress = string.IsNullOrEmpty(dn.Email) == false ? dn.Email : "ConSignee@LeaderGroup.com",
+    Type = string.Empty
+    };
+    #endregion
+    
+    
+    
+    #region Main
+    _Shipment.Reference1 = CompanyInfo.Company_Code.ToString();
+    _Shipment.Reference2 = bu.ToString();
+    _Shipment.Reference3 = dn.DeliveryNoteID;//DI5819020000000064
+    _Shipment.ForeignHAWB = string.Empty;
+    _Shipment.TransportType = 0;
+    
+    
+    
+    _Shipment.ShippingDateTime = dn.DeliveryDate;//2/24/2019 5:27:14 PM
+    _Shipment.DueDate = dn.DueDate.Value;//3/20/2019 5:27:14 PM
+    _Shipment.PickupLocation = string.Empty;
+    _Shipment.PickupGUID = string.Empty;
+    _Shipment.Comments = string.Empty;
+    _Shipment.AccountingInstrcutions = string.Empty;
+    _Shipment.OperationsInstructions = string.Empty;
+    #endregion
+    
+    
+    
+    #region Details
+    _Shipment.Details = new ShipmentDetails
+    {
+    Dimensions = new Dimensions
+    {
+    Length = 0,
+    Width = 0,
+    Height = 0,
+    Unit = "cm"
+    },
+    
+    
+    
+    
+    ActualWeight = new Weight
+    {
+    Value = 1,
+    Unit = "KG"
+    }
+    };
+    string AramexCurrencyCode = DeliveryNoteServices.GetAramexCurrencyCode(Convert.ToInt32(dn.Cur_Code));
+    if (dn.Country == 1)
+    {
+    _Shipment.Details.ProductGroup = System.Configuration.ConfigurationManager.AppSettings["ProductGroup"]; //"DOM";
+    _Shipment.Details.ProductType = System.Configuration.ConfigurationManager.AppSettings["ProductType"]; //"OND";//"OND" "ONP"
+    }
+    else
+    {
+    _Shipment.Details.ProductGroup = System.Configuration.ConfigurationManager.AppSettings["OverseasProductGroup"];
+    _Shipment.Details.ProductType = System.Configuration.ConfigurationManager.AppSettings["OverseasProductType"];
+    
+    
+    
+    _Shipment.Details.CustomsValueAmount = new Money
+    {
+    Value = Convert.ToDouble(System.Configuration.ConfigurationManager.AppSettings["OverseasCustomsAmount"]),
+    //_Shipment.Details.CustomsValueAmount.CurrencyCode = string.IsNullOrEmpty(dn.CurrencyShortName) == false ? dn.CurrencyShortName
+    // : System.Configuration.ConfigurationManager.AppSettings["CODCurrency"];
+    
+    
+    
+    CurrencyCode = string.IsNullOrEmpty(AramexCurrencyCode) == false ? AramexCurrencyCode
+    : System.Configuration.ConfigurationManager.AppSettings["CODCurrency"]
+    };
+    }
+    
+    
+    
+    _Shipment.Details.PaymentType = System.Configuration.ConfigurationManager.AppSettings["PaymentType"]; //"C";//"C" "P"
+    _Shipment.Details.PaymentOptions = System.Configuration.ConfigurationManager.AppSettings["PaymentOptions"]; //"ARCC";
+    if (dn.Country == 1)
+    {
+    if (isCOD)
+    {
+    _Shipment.Details.PaymentOptions = "CASH";
+    _Shipment.Details.Services = "CODS";
+    _Shipment.Details.CashOnDeliveryAmount = new Money
+    {
+    Value = Convert.ToDouble(dn.Net ?? 0),//CODValue
+    //_Shipment.Details.CashOnDeliveryAmount.CurrencyCode = string.IsNullOrEmpty(dn.CurrencyShortName) == false ? dn.CurrencyShortName
+    //: System.Configuration.ConfigurationManager.AppSettings["CODCurrency"];
+    CurrencyCode = string.IsNullOrEmpty(AramexCurrencyCode) == false ? AramexCurrencyCode : System.Configuration.ConfigurationManager.AppSettings["CODCurrency"]
+    };
+    
+    
+    
+    }
+    else
+    _Shipment.Details.Services = string.Empty;
+    }
+    else
+    _Shipment.Details.Services = string.Empty;
+    
+    
+    
+    _Shipment.Details.GoodsOriginCountry = string.Empty;
+    _Shipment.Details.CashAdditionalAmountDescription = string.Empty;
+    
+    
+    
+    string itemsName = "";
+    _Items = GetShipmentItems(itmList, ref itemsName);
+    _Shipment.Details.DescriptionOfGoods = "Electronic Items";
+    
+    
+    
+    if ((_Items != null))
+    _Shipment.Details.Items = _Items.ToArray();
+    _Shipment.Details.NumberOfPieces = 1;
+    #endregion
+    
+    
+    
+    #endregion
+    }
+    catch (Exception ex)
+    {
+    ExceptionLog.WriteException(ex, "DeliveryNoteController:- GetAramexShippment");
+    ExceptionLog.LogException(ex, "DeliveryNoteController:- GetAramexShippment");
+    }
+    return _Shipment;

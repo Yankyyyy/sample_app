@@ -103,15 +103,15 @@ web_include_js = "/assets/sample_app/js/sample_app.js"
 
 doc_events = {
 	"YankyDT": {
-		"before_save": "sample_app.fixtures.PersonalScripts.trial.trial1",  
-		"after_save": "sample_app.API.SOAP_API_test.print_label",
-  		"onload": "sample_app.API.SOAP_API.cancel_pickup"
+		# "before_save": "sample_app.fixtures.PersonalScripts.trial.trial1",  
+		# "after_save": "sample_app.API.SOAP_API_test.print_label"  		
 	},
 	"Sales Invoice": {
-		"onload": "sample_app.API.CreateShipmentsAPI.create_shipments"
+		# "onload": "sample_app.API.SOAP_API.cancel_pickup"
 	},
 	"Shipment": {
-		"onload": "sample_app.API.TrackShipmentsAPI.track_shipments"
+		# "onload": "sample_app.API.TrackShipmentsAPI.track_shipments",
+  		# "onload": "sample_app.API.CreateShipmentsAPI.create_shipments"
 	}
 }
 

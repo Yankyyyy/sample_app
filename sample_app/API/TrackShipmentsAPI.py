@@ -1,7 +1,7 @@
 import frappe
 import json
 import requests
-
+from bs4 import BeautifulSoup
 
 @frappe.whitelist()
 def track_shipments(doc, method):
@@ -35,8 +35,6 @@ def track_shipments(doc, method):
         "Shipments": {
             "Shipment" : {
                 "Reference1": "string",
-                "Reference2": "string",
-                "Reference3": "string",
                 "Shipper": {
                     "Reference1": "Ref 111111",
                     "Reference2": "Ref 222222",
@@ -44,218 +42,62 @@ def track_shipments(doc, method):
                     "PartyAddress": {
                         "Line1": pick_up_address_doc.address_line1,
                         "Line2": pick_up_address_doc.address_line2,
-                        "Line3": "string",
                         "City": pick_up_address_doc.city,
                         "StateOrProvinceCode": "string",
                         "PostCode": pick_up_address_doc.pincode,
-                        "CountryCode": "SA",
-                        "Longitude": "66",
-                        "Latitude": "54",
-                        "BuildingNumber": "string",
-                        "BuildingName": pick_up_address_doc.address_title,
-                        "Floor": "string",
-                        "Apartment": "string",
-                        "POBox": "string",
-                        "Description": "string"
+                        "CountryCode": "SA"
                     },
                     "Contact": {
-                        "Department": "string",
                         "PersonName": doc.pickup_contact_person,
                         "Title": "string",
                         "CompanyName": doc.pickup_company,
                         "PhoneNumber1": "5555555",
                         "PhoneNumber1Ext": "125",
-                        "PhoneNumber2": "string",
-                        "PhoneNumber2Ext": "string",
-                        "FaxNumber": "string",
                         "CellPhone": pick_up_address_doc.phone,
-                        "EmailAddress": pick_up_address_doc.email_id,
-                        "Type": pick_up_address_doc.address_type
+                        "EmailAddress": pick_up_address_doc.email_id
                     }
                 },
                 "Consignee" : {
                     "Reference1" : "string",
                     "Reference2" : "string",
-                    "AccountNumber" : "string",
+                    "AccountNumber" : "",
                     "PartyAddress": {
                         "Line1": delivery_address_doc.address_line1,
                         "Line2": delivery_address_doc.address_line2,
-                        "Line3": "string",
                         "City": delivery_address_doc.city,
                         "StateOrProvinceCode": "string",
                         "PostCode": delivery_address_doc.pincode,
-                        "CountryCode": "SA",
-                        "Longitude": "66",
-                        "Latitude": "54",
-                        "BuildingNumber": "string",
-                        "BuildingName": delivery_address_doc.address_title,
-                        "Floor": "string",
-                        "Apartment": "string",
-                        "POBox": "string",
-                        "Description": "string"
+                        "CountryCode": "SA"
                     },
                     "Contact": {
-                        "Department": "string",
                         "PersonName": "Michael",
                         "Title": "string",
                         "CompanyName": doc.delivery_company,
                         "PhoneNumber1": "5555555",
                         "PhoneNumber1Ext": "125",
-                        "PhoneNumber2": "string",
-                        "PhoneNumber2Ext": "string",
-                        "FaxNumber": "string",
                         "CellPhone": delivery_address_doc.phone,
-                        "EmailAddress": delivery_address_doc.email_id,
-                        "Type": delivery_address_doc.address_type
+                        "EmailAddress": delivery_address_doc.email_id
                     }
                 },
-                "ThirdParty" : {
-                    "Reference1" : "string",
-                    "Reference2" : "string",
-                    "AccountNumber" : "string",
-                    "PartyAddress" : {
-                        "Line1" : "Mecca St",
-                        "Line2" : "string",
-                        "Line3" : "string",
-                        "City" : "Amman",
-                        "StateOrProvinceCode" : "string",
-                        "PostCode" : "string",
-                        "CountryCode" : "JO",
-                        "Longitude" : "66",
-                        "Latitude" : "54",
-                        "BuildingNumber" : "string",
-                        "BuildingName" : "string",
-                        "Floor" : "string",
-                        "Apartment" : "string",
-                        "POBox" : "string",
-                        "Description" : "string"
-                    },
-                    "Contact" : {
-                        "Department": "string",
-                        "PersonName": "Michael",
-                        "Title": "string",
-                        "CompanyName": "Aramex",
-                        "PhoneNumber1": "5555555",
-                        "PhoneNumber1Ext": "125",
-                        "PhoneNumber2": "string",
-                        "PhoneNumber2Ext": "string",
-                        "FaxNumber": "string",
-                        "CellPhone": "07777777",
-                        "EmailAddress": "michael@aramex.com",
-                        "Type": "string"
-                    }                
-                },
                 "ShippingDateTime" : doc.pickup_date,
-                "DueDate" : "2021-11-16T08:16:08.058Z",
-                "Comments" : doc.description_of_content,
-                "PickupLocation" : doc.pickup_address_name,
-                "OperationsInstructions" : "string",
-                "AccountingInstructions" : "string",
                 "Details" : {
-                    "Dimensions" : {
-                        "Length" : "81",
-                        "Width" : "57",
-                        "Height" : "40",
-                        "Unit" : "CM"
-                    },
                     "ActualWeight" : {
                         "Unit" : "KG",
                         "Value" : "93"
-                    },
-                    "ChargeableWeight" : {
-                        "Unit" : "string",
-                        "Value" : "26"
                     },
                     "DescriptionOfGoods" : "string",
                     "GoodsOriginCountry" : "SA",
                     "NumberOfPieces" : "100",
                     "ProductGroup" : "DOM",
-                    "ProductType" : "string",
+                    "ProductType" : "OND",
                     "PaymentType" : "P",
-                    "PaymentOptions" : "string",
-                    "CustomsValueAmount" : {
-                        "CurrencyCode" : "USD",
-                        "Value" : "11"
-                    },
-                    "CashOnDeliveryAmount" : {
-                        "CurrencyCode" : "USD",
-                        "Value" : "33"
-                    },
-                    "InsuranceAmount" : {
-                        "CurrencyCode" : "USD",
-                        "Value" : "41"
-                    },
-                    "CashAdditionalAmount" : {
-                        "CurrencyCode" : "USD",
-                        "Value" : "19"
-                    },
-                    "CashAdditionalAmountDescription" : "string",
-                    "CollectAmount" : {
-                        "CurrencyCode" : "USD",
-                        "Value" : "18"
-                    },
-                    "Services" : "string",
-                    "Items" : {
-                        "ShipmentItem" : {
-                            "PackageType" : "string",
-                            "Quantity" : "100",
-                            "Weight" : {
-                                "Unit" : "KG",
-                                "Value" : "47"
-                            },
-                            "Comments" : "string",
-                            "Reference" : "string",
-                            "PiecesDimensions" : {
-                                "Dimensions" : {
-                                    "Length" : "65",
-                                    "Width" : "14",
-                                    "Height" : "97",
-                                    "Unit" : "M"
-                                }
-                            },
-                            "CommodityCode" : "string",
-                            "GoodsDescription" : "string",
-                            "CountryOfOrigin" : "SA",
-                            "CustomsValue" : {
-                                "CurrencyCode" : "USD",
-                                "Value" : "7" 
-                            },
-                            "ContainerNumber" : "string"                  
-
-                        }
-                    },
-                    "DeliveryInstructions" : {
-                        "Option" : "string",
-                        "Reference" : "string"
-                    },
-                    "AdditionalProperties" : {
-                        "AdditionalProperty" : {
-                            "CategoryName" : "string",
-                            "Name" : "string",
-                            "Value" : "string"
-                        }
-                    },
-                    "ContainsDangerousGoods" : "true"
-
-                },
-                "Attachments" : {
-                    "Attachment" : {
-                        "FileName" : "string",
-                        "FileExtension" : "string",
-                        "FileContents" : "Y29udGVudA=="
-                    }
                 },
                 "ForeignHAWB" : "ABC 000111",
-                "TransportType_x0020_" : "1",
-                "PickupGUID" : "string",
-                "Number" : "string", 
-                "ScheduledDelivery" : {
-                    "PreferredDeliveryDate" : "2021-11-16T08:16:08.058Z",
-                    "PreferredDeliveryTimeFrame_x0020_" : "string",
-                    "PreferredDeliveryTime" : "string"
-                }
             }          
         },
+        
+        "GetLastTrackingUpdateOnly" : "1",
+        
         "LabelInfo" : {
             "ReportID" : "9201",
             "ReportType" : "URL"
@@ -287,8 +129,6 @@ def track_shipments(doc, method):
                     <Shipments>
                         <Shipment>
                             <Reference1>{track_shipments_dictionary["Shipments"]["Shipment"]["Reference1"]}</Reference1>
-                            <Reference2>{track_shipments_dictionary["Shipments"]["Shipment"]["Reference2"]}</Reference2>
-                            <Reference3>{track_shipments_dictionary["Shipments"]["Shipment"]["Reference3"]}</Reference3>
                             <Shipper>
                                 <Reference1>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Reference1"]}</Reference1>
                                 <Reference2>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Reference2"]}</Reference2>
@@ -296,33 +136,19 @@ def track_shipments(doc, method):
                                 <PartyAddress>
                                     <Line1>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Line1"]}</Line1>
                                     <Line2>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Line2"]}</Line2>
-                                    <Line3>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Line3"]}</Line3>
                                     <City>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["City"]}</City>
                                     <StateOrProvinceCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["StateOrProvinceCode"]}</StateOrProvinceCode>
                                     <PostCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["PostCode"]}</PostCode>
                                     <CountryCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["CountryCode"]}</CountryCode>
-                                    <Longitude>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Longitude"]}</Longitude>
-                                    <Latitude>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Latitude"]}</Latitude>
-                                    <BuildingNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["BuildingNumber"]}</BuildingNumber>
-                                    <BuildingName>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["BuildingName"]}</BuildingName>
-                                    <Floor>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Floor"]}</Floor>
-                                    <Apartment>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Apartment"]}</Apartment>
-                                    <POBox>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["POBox"]}</POBox>
-                                    <Description>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["PartyAddress"]["Description"]}</Description>
                                 </PartyAddress>
                                 <Contact>
-                                    <Department>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["Department"]}</Department>
                                     <PersonName>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["PersonName"]}</PersonName>
                                     <Title>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["Title"]}</Title>
                                     <CompanyName>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["CompanyName"]}</CompanyName>
                                     <PhoneNumber1>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["PhoneNumber1"]}</PhoneNumber1>
                                     <PhoneNumber1Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["PhoneNumber1Ext"]}</PhoneNumber1Ext>
-                                    <PhoneNumber2>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["PhoneNumber2"]}</PhoneNumber2>
-                                    <PhoneNumber2Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["PhoneNumber2Ext"]}</PhoneNumber2Ext>
-                                    <FaxNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["FaxNumber"]}</FaxNumber>
                                     <CellPhone>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["CellPhone"]}</CellPhone>
                                     <EmailAddress>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["EmailAddress"]}</EmailAddress>
-                                    <Type>{track_shipments_dictionary["Shipments"]["Shipment"]["Shipper"]["Contact"]["Type"]}</Type>
                                 </Contact>
                             </Shipper>
                             <Consignee>
@@ -332,184 +158,45 @@ def track_shipments(doc, method):
                                 <PartyAddress>
                                     <Line1>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Line1"]}</Line1>
                                     <Line2>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Line2"]}</Line2>
-                                    <Line3>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Line3"]}</Line3>
                                     <City>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["City"]}</City>
                                     <StateOrProvinceCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["StateOrProvinceCode"]}</StateOrProvinceCode>
                                     <PostCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["PostCode"]}</PostCode>
                                     <CountryCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["CountryCode"]}</CountryCode>
-                                    <Longitude>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Longitude"]}</Longitude>
-                                    <Latitude>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Latitude"]}</Latitude>
-                                    <BuildingNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["BuildingNumber"]}</BuildingNumber>
-                                    <BuildingName>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["BuildingName"]}</BuildingName>
-                                    <Floor>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Floor"]}</Floor>
-                                    <Apartment>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Apartment"]}</Apartment>
-                                    <POBox>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["POBox"]}</POBox>
-                                    <Description>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["PartyAddress"]["Description"]}</Description>
                                 </PartyAddress>
                                 <Contact>
-                                    <Department>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["Department"]}</Department>
                                     <PersonName>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["PersonName"]}</PersonName>
                                     <Title>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["Title"]}</Title>
                                     <CompanyName>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["CompanyName"]}</CompanyName>
                                     <PhoneNumber1>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["PhoneNumber1"]}</PhoneNumber1>
                                     <PhoneNumber1Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["PhoneNumber1Ext"]}</PhoneNumber1Ext>
-                                    <PhoneNumber2>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["PhoneNumber2"]}</PhoneNumber2>
-                                    <PhoneNumber2Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["PhoneNumber2Ext"]}</PhoneNumber2Ext>
-                                    <FaxNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["FaxNumber"]}</FaxNumber>
                                     <CellPhone>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["CellPhone"]}</CellPhone>
                                     <EmailAddress>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["EmailAddress"]}</EmailAddress>
-                                    <Type>{track_shipments_dictionary["Shipments"]["Shipment"]["Consignee"]["Contact"]["Type"]}</Type>
                                 </Contact>
                             </Consignee>
-                            <ThirdParty>
-                                <Reference1>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Reference1"]}</Reference1>
-                                <Reference2>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Reference2"]}</Reference2>
-                                <AccountNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["AccountNumber"]}</AccountNumber>
-                                <PartyAddress>
-                                    <Line1>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Line1"]}</Line1>
-                                    <Line2>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Line2"]}</Line2>
-                                    <Line3>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Line3"]}</Line3>
-                                    <City>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["City"]}</City>
-                                    <StateOrProvinceCode>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["StateOrProvinceCode"]}</StateOrProvinceCode>
-                                    <PostCode>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["PostCode"]}</PostCode>
-                                    <CountryCode>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["CountryCode"]}</CountryCode>
-                                    <Longitude>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Longitude"]}</Longitude>
-                                    <Latitude>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Latitude"]}</Latitude>
-                                    <BuildingNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["BuildingNumber"]}</BuildingNumber>
-                                    <BuildingName>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["BuildingName"]}</BuildingName>
-                                    <Floor>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Floor"]}</Floor>
-                                    <Apartment>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Apartment"]}</Apartment>
-                                    <POBox>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["POBox"]}</POBox>
-                                    <Description>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["PartyAddress"]["Description"]}</Description>
-                                </PartyAddress>
-                                <Contact>
-                                    <Department>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["Department"]}</Department>
-                                    <PersonName>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["PersonName"]}</PersonName>
-                                    <Title>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["Title"]}</Title>
-                                    <CompanyName>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["CompanyName"]}</CompanyName>
-                                    <PhoneNumber1>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["PhoneNumber1"]}</PhoneNumber1>
-                                    <PhoneNumber1Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["PhoneNumber1Ext"]}</PhoneNumber1Ext>
-                                    <PhoneNumber2>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["PhoneNumber2"]}</PhoneNumber2>
-                                    <PhoneNumber2Ext>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["PhoneNumber2Ext"]}</PhoneNumber2Ext>
-                                    <FaxNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["FaxNumber"]}</FaxNumber>
-                                    <CellPhone>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["CellPhone"]}</CellPhone>
-                                    <EmailAddress>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["EmailAddress"]}</EmailAddress>
-                                    <Type>{track_shipments_dictionary["Shipments"]["Shipment"]["ThirdParty"]["Contact"]["Type"]}</Type>
-                                </Contact>
-                            </ThirdParty>
                             <ShippingDateTime>{track_shipments_dictionary["Shipments"]["Shipment"]["ShippingDateTime"]}</ShippingDateTime>
-                            <DueDate>{track_shipments_dictionary["Shipments"]["Shipment"]["DueDate"]}</DueDate>
-                            <Comments>{track_shipments_dictionary["Shipments"]["Shipment"]["Comments"]}</Comments>
-                            <PickupLocation>{track_shipments_dictionary["Shipments"]["Shipment"]["PickupLocation"]}</PickupLocation>
-                            <OperationsInstructions>{track_shipments_dictionary["Shipments"]["Shipment"]["OperationsInstructions"]}</OperationsInstructions>
-                            <AccountingInstructions>{track_shipments_dictionary["Shipments"]["Shipment"]["AccountingInstructions"]}</AccountingInstructions>
                             <Details>
-                                <Dimensions>
-                                    <Length>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Dimensions"]["Length"]}</Length>
-                                    <Width>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Dimensions"]["Width"]}</Width>
-                                    <Height>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Dimensions"]["Height"]}</Height>
-                                    <Unit>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Dimensions"]["Unit"]}</Unit>
-                                </Dimensions>
                                 <ActualWeight>
                                     <Unit>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ActualWeight"]["Unit"]}</Unit>
                                     <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ActualWeight"]["Value"]}</Value>
                                 </ActualWeight>
-                                <ChargeableWeight>
-                                    <Unit>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ChargeableWeight"]["Unit"]}</Unit>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ChargeableWeight"]["Value"]}</Value>
-                                </ChargeableWeight>
                                 <DescriptionOfGoods>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["DescriptionOfGoods"]}</DescriptionOfGoods>
                                 <GoodsOriginCountry>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["GoodsOriginCountry"]}</GoodsOriginCountry>
                                 <NumberOfPieces>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["NumberOfPieces"]}</NumberOfPieces>
                                 <ProductGroup>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ProductGroup"]}</ProductGroup>
                                 <ProductType>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ProductType"]}</ProductType>
                                 <PaymentType>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["PaymentType"]}</PaymentType>
-                                <PaymentOptions>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["PaymentOptions"]}</PaymentOptions>
-                                <CustomsValueAmount>
-                                    <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CustomsValueAmount"]["CurrencyCode"]}</CurrencyCode>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CustomsValueAmount"]["Value"]}</Value>
-                                </CustomsValueAmount>
-                                <CashOnDeliveryAmount>
-                                    <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CashOnDeliveryAmount"]["CurrencyCode"]}</CurrencyCode>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CashOnDeliveryAmount"]["Value"]}</Value>
-                                </CashOnDeliveryAmount>
-                                <InsuranceAmount>
-                                    <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["InsuranceAmount"]["CurrencyCode"]}</CurrencyCode>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["InsuranceAmount"]["Value"]}</Value>
-                                </InsuranceAmount>
-                                <CashAdditionalAmount>
-                                    <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CashAdditionalAmount"]["CurrencyCode"]}</CurrencyCode>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CashAdditionalAmount"]["Value"]}</Value>
-                                </CashAdditionalAmount>
-                                <CashAdditionalAmountDescription>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CashAdditionalAmountDescription"]}</CashAdditionalAmountDescription>
-                                <CollectAmount>
-                                    <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CollectAmount"]["CurrencyCode"]}</CurrencyCode>
-                                    <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["CollectAmount"]["Value"]}</Value>
-                                </CollectAmount>
-                                <Services>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Services"]}</Services>
-                                <Items>
-                                    <ShipmentItem>
-                                        <PackageType>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["PackageType"]}</PackageType>
-                                        <Quantity>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["Quantity"]}</Quantity>
-                                        <Weight>
-                                            <Unit>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["Weight"]["Unit"]}</Unit>
-                                            <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["Weight"]["Value"]}</Value>
-                                        </Weight>
-                                        <Comments>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["Comments"]}</Comments>
-                                        <Reference>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["Reference"]}</Reference>
-                                        <PiecesDimensions>
-                                            <Dimensions>
-                                                <Length>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["PiecesDimensions"]["Dimensions"]["Length"]}</Length>
-                                                <Width>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["PiecesDimensions"]["Dimensions"]["Width"]}</Width>
-                                                <Height>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["PiecesDimensions"]["Dimensions"]["Height"]}</Height>
-                                                <Unit>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["PiecesDimensions"]["Dimensions"]["Unit"]}</Unit>
-                                            </Dimensions>
-                                        </PiecesDimensions>
-                                        <CommodityCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["CommodityCode"]}</CommodityCode>
-                                        <GoodsDescription>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["GoodsDescription"]}</GoodsDescription>
-                                        <CountryOfOrigin>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["CountryOfOrigin"]}</CountryOfOrigin>
-                                        <CustomsValue>
-                                            <CurrencyCode>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["CustomsValue"]["CurrencyCode"]}</CurrencyCode>
-                                            <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["CustomsValue"]["Value"]}</Value>
-                                        </CustomsValue>
-                                        <ContainerNumber>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["Items"]["ShipmentItem"]["ContainerNumber"]}</ContainerNumber>
-                                    </ShipmentItem>
-                                </Items>
-                                <AdditionalProperties>
-                                    <AdditionalProperty>
-                                        <CategoryName>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["AdditionalProperties"]["AdditionalProperty"]["CategoryName"]}</CategoryName>
-                                        <Name>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["AdditionalProperties"]["AdditionalProperty"]["Name"]}</Name>
-                                        <Value>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["AdditionalProperties"]["AdditionalProperty"]["Value"]}</Value>
-                                    </AdditionalProperty>
-                                </AdditionalProperties>
-                                <ContainsDangerousGoods>{track_shipments_dictionary["Shipments"]["Shipment"]["Details"]["ContainsDangerousGoods"]}</ContainsDangerousGoods>
                             </Details>
-                            <Attachments>
-                                <Attachment>
-                                    <FileName>{track_shipments_dictionary["Shipments"]["Shipment"]["Attachments"]["Attachment"]["FileName"]}</FileName>
-                                    <FileExtension>{track_shipments_dictionary["Shipments"]["Shipment"]["Attachments"]["Attachment"]["FileExtension"]}</FileExtension>
-                                    <FileContents>{track_shipments_dictionary["Shipments"]["Shipment"]["Attachments"]["Attachment"]["FileContents"]}</FileContents>
-                                </Attachment>
-                            </Attachments>
                             <ForeignHAWB>{track_shipments_dictionary["Shipments"]["Shipment"]["ForeignHAWB"]}</ForeignHAWB>
-                            <TransportType_x0020_>{track_shipments_dictionary["Shipments"]["Shipment"]["TransportType_x0020_"]}</TransportType_x0020_>
-                            <PickupGUID>{track_shipments_dictionary["Shipments"]["Shipment"]["PickupGUID"]}</PickupGUID>
-                            <Number>{track_shipments_dictionary["Shipments"]["Shipment"]["Number"]}</Number>
-                            <ScheduledDelivery>
-                                <PreferredDeliveryDate>{track_shipments_dictionary["Shipments"]["Shipment"]["ScheduledDelivery"]["PreferredDeliveryDate"]}</PreferredDeliveryDate>
-                                <PreferredDeliveryTimeFrame_x0020_>{track_shipments_dictionary["Shipments"]["Shipment"]["ScheduledDelivery"]["PreferredDeliveryTimeFrame_x0020_"]}</PreferredDeliveryTimeFrame_x0020_>
-                                <PreferredDeliveryTime>{track_shipments_dictionary["Shipments"]["Shipment"]["ScheduledDelivery"]["PreferredDeliveryTime"]}</PreferredDeliveryTime>
-                            </ScheduledDelivery>
                         </Shipment>
                     </Shipments>
+                    <GetLastTrackingUpdateOnly>{track_shipments_dictionary["GetLastTrackingUpdateOnly"]}</GetLastTrackingUpdateOnly>
                     <LabelInfo>
                         <ReportID>{track_shipments_dictionary["LabelInfo"]["ReportID"]}</ReportID>
                         <ReportType>{track_shipments_dictionary["LabelInfo"]["ReportType"]}</ReportType>
                     </LabelInfo>
                 </ShipmentTrackingRequest>
             </soap:Body>
-            </soap:Envelope>
-            """
+            </soap:Envelope>"""
     headers = {
 	'Content-Type': 'text/xml; charset=utf-8',
     'SOAPAction':'http://ws.aramex.net/ShippingAPI/v1/Service_1_0/TrackShipments'
