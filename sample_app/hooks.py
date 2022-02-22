@@ -173,3 +173,4 @@ user_data_fields = [
 # 	"sample_app.auth.validate"
 # ]
 
+fixtures = ["Custom Field"]
