@@ -3,7 +3,7 @@
 import frappe
 import json
 import requests
-from foxerp.utils import createAPIErrorLog
+from sample_app.utils import createAPIErrorLog
 
 
 @frappe.whitelist()
@@ -41,8 +41,8 @@ def createUser():
         user.save(ignore_permissions=True)
         frappe.db.commit()
         return {
-            user_id : user.username,
-            message : "User-Created Successfully"
+            "user_id" : user.username,
+            "message" : "User-Created Successfully"
         }
     except Exception:
         createAPIErrorLog(frappe.get_traceback())
