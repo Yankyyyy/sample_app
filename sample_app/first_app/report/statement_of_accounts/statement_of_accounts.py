@@ -477,7 +477,7 @@ def get_result_as_list(data, filters):
 
 	for d in data:
 		#Updating Party column with  Employee's employee_name   if party_type  is Employee
-		if d.party_type == "Employee":
+		if "party_type" in d and  d.party_type == "Employee":
 			d['party']= frappe.db.get_value ("Employee",{"name":d.get('party')},"employee_name")
 		
 		#Updating Party column with  Employee's employee_name   if party_type  is Employee
@@ -485,13 +485,14 @@ def get_result_as_list(data, filters):
 			d['employee']= frappe.db.get_value ("Employee",{"name":d.get('employee')},"employee_name")
 
 		#Sales Return and Credit issue voucher types
-		d["voucher_type_custom"] = d.voucher_type
-		if d.voucher_type == "Sales Invoice" :
-			si_status = frappe.db.get_value ("Sales Invoice",{"name":d.get('voucher_no')},"status")
-			if si_status == "Credit Note Issued":
-				d['voucher_type_custom'] ="Credit Note"
-			elif si_status == "Return":
-				d['voucher_type_custom'] ="Sales Return"
+		if "voucher_type" in d :
+			d["voucher_type_custom"] = d.voucher_type
+			if d.voucher_type == "Sales Invoice" :
+				si_status = frappe.db.get_value ("Sales Invoice",{"name":d.get('voucher_no')},"status")
+				if si_status == "Credit Note Issued":
+					d['voucher_type_custom'] ="Credit Note"
+				elif si_status == "Return":
+					d['voucher_type_custom'] ="Sales Return"
 		
 		if not d.get('posting_date'):
 			balance, balance_in_account_currency = 0, 0

@@ -35,8 +35,8 @@ def execute(filters=None):
             percentage_days_remaining = round(flt(days_remaining/date_diff(project.expected_end_date, project.expected_start_date)),2)
         project["percentage_days_remaining"] = percentage_days_remaining
         if project.sales_order:
-            project_value = frappe.db.get_value('Sales Order', project.sales_order, 'grand_total')
-            delivered_value = flt(frappe.db.sql("""select ifnull(sum(amount), 0)
+            project_value = frappe.db.get_value('Sales Order', project.sales_order, 'base_grand_total')
+            delivered_value = flt(frappe.db.sql("""select ifnull(sum(base_amount), 0)
 				from `tabDelivery Note Item` where against_sales_order="%s" and docstatus=1""" %
 				(project.sales_order))[0][0])  
             invoiced_value = flt(frappe.db.sql("""select ifnull(sum(base_net_amount), 0)

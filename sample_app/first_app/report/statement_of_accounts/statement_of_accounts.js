@@ -192,4 +192,4 @@ frappe.query_reports["Statement of Accounts"] = {
 	]
 }
 
-erpnext.utils.add_dimensions('General Ledger', 15)
+erpnext.utils.add_dimensions('Statement of Accounts', 15)

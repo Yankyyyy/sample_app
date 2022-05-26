@@ -29,7 +29,7 @@ def execute(filters=None):
 				(project.name))[0][0])
         project["project_cost"] = project_cost
         if project.sales_order:
-            project_value = frappe.db.get_value('Sales Order', project.sales_order, 'grand_total')
+            project_value = frappe.db.get_value('Sales Order', project.sales_order, 'base_grand_total')
             project["margin_percentage"] = round(((project_value-project_cost)/project_value)*100) 
             invoiced_value = flt(frappe.db.sql("""select ifnull(sum(base_net_amount), 0)
 				from `tabSales Invoice Item` where sales_order="%s" and docstatus=1""" %

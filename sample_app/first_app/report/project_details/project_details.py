@@ -45,7 +45,7 @@ def execute(filters=None):
             fields=["name",
                     "customer",
                     "project",
-                    "grand_total"
+                    "base_grand_total"
                 ],
             order_by="modified")
         
@@ -61,7 +61,7 @@ def execute(filters=None):
             
             # Get List of Sales Invoice as per Delivery Note and Sales Invoice and filters
             sales_invoice = """SELECT DISTINCT si.name, 
-                                si.total, si.grand_total, si.total_taxes_and_charges
+                                si.base_total, si.base_grand_total, si.base_total_taxes_and_charges
                             FROM `tabSales Invoice Item` sii
                             inner join `tabSales Invoice` si 
                                 on si.name = sii.parent 
@@ -75,9 +75,9 @@ def execute(filters=None):
             if sales_invoice:
                 for sales in sales_invoice:
                     sales_inv += sales.get("name")
-                    inv_amt += sales.get("total")
-                    vat_amt += sales.get("total_taxes_and_charges")
-                    inv_amt_with_vat += sales.get("grand_total")
+                    inv_amt += sales.get("base_total")
+                    vat_amt += sales.get("base_total_taxes_and_charges")
+                    inv_amt_with_vat += sales.get("base_grand_total")
                     
                     # Get List of Payment Receipt as per Sales Invoice and filters
                     payment_receipt = """select pe.name, per.allocated_amount, pe.total_taxes_and_charges
@@ -106,7 +106,7 @@ def execute(filters=None):
             delivery["remaining_amount"] = inv_amt_with_vat - total_collect_amt
 
             #sub-Total
-            total_delivery_amount += delivery.get("grand_total")
+            total_delivery_amount += delivery.get("base_grand_total")
             total_invoice_amount += inv_amt
             total_vat_amount += vat_amt
             total_invoice_amount_with_vat += inv_amt_with_vat

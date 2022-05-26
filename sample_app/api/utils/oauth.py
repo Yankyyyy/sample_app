@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
 import frappe
+from frappe import _
 import requests
 import json
-from leadergroup.utils import createAPIErrorLog
+from foxerp_lectronic.utils import createAPIErrorLog
 from frappe.utils.password import update_password, check_password
+import urllib
 
 @frappe.whitelist()
 def callback(code):
@@ -16,15 +19,17 @@ def login():
             app_name = data.get("app_name")
             usr = data.get("usr")
             pwd = data.get("pwd")
+            lang = frappe.request.headers.get('Lang')
 
             # To get sid and other details from cookies
-            cookies = frappe_login(usr,pwd)
+            cookies = frappe_login(usr,pwd,lang)
 
             if cookies:
                 cookie_string = "; ".join([str(x)+"="+str(y) for x,y in cookies.items()])
                 if app_name:
                     if not frappe.db.exists("OAuth Client",{"app_name": app_name }):
-                        frappe.throw(app_name+ " OAuth Client Not Found")
+                        massage = _("OAuth Client Not Found", lang = lang)
+                        frappe.throw(app_name + " " +massage)
                     else:
                         oauth_client = frappe.db.get_value("OAuth Client",{"app_name": app_name },["client_id","default_redirect_uri","grant_type"],as_dict=1)
                         client_id = oauth_client.client_id
@@ -45,7 +50,7 @@ def login():
                             response = requests.request("POST", auth_url, headers=headers, data=payload)
                             response_text = json.loads(response.text)
                             if response.status_code != 200:
-                                frappe.throw(response_text.get("_server_messages"))
+                                frappe.throw(_(response_text.get("_server_messages"), lang = lang))
                             else:
                                 # To get access token using authorize code
                                 if response_text.get("message"):
@@ -53,19 +58,20 @@ def login():
                                     token_resp = requests.request("POST", token_url, headers=headers, data=payload)
                                     token_resp_text = json.loads(token_resp.text)
                                     if token_resp.status_code != 200:
-                                        frappe.throw(token_resp_text.get("_server_messages"))
+                                        frappe.throw(_(token_resp_text.get("_server_messages"), lang = lang))
                                     else:
+                                        token_resp_text["roles"] = frappe.get_roles(urllib.parse.unquote(cookies.get("user_id")))
                                         return token_resp_text
                         else:
-                            frappe.throw("Grant Type in Oauth Client is not Authorization Code")
+                            frappe.throw(_("Grant Type in Oauth Client is not Authorization Code", lang = lang))
                 else:
-                    frappe.throw("Please Provide OAuth Client App Name")
+                    frappe.throw(_("Please Provide OAuth Client App Name", lang = lang))
         except Exception:
             error = frappe.get_traceback()
             createAPIErrorLog(error)
             return error
 
-def frappe_login(usr,pwd):
+def frappe_login(usr,pwd,lang):
     login_url = frappe.utils.get_url() + "/api/method/login"
     payload = json.dumps({"usr": usr, "pwd": pwd })
     headers = {
@@ -77,12 +83,13 @@ def frappe_login(usr,pwd):
         return session.cookies.get_dict()
     else:
         login_resp_text = json.loads(login_resp.text)
-        frappe.throw(login_resp_text.get("message"))
+        frappe.throw(_(login_resp_text.get("message"), lang = lang))
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_access_token_from_refresh_token(refresh_token):
     try:
         #getting access token from valid refresh token
+        lang = frappe.request.headers.get('Lang')
         token_url =  frappe.utils.get_url() + "/api/method/frappe.integrations.oauth2.get_token"
         token_payload= f'grant_type=refresh_token&refresh_token={refresh_token}'
         token_headers = {
@@ -91,7 +98,7 @@ def get_access_token_from_refresh_token(refresh_token):
         token_response = requests.request("POST", token_url, headers=token_headers, data=token_payload)
         token_response_text = json.loads(token_response.text)
         if token_response.status_code != 200:
-            frappe.throw(token_response_text.get("_server_messages"))
+            frappe.throw(_(token_response_text.get("_server_messages"), lang = lang))
         else:
             return token_response_text
     except Exception:
@@ -99,10 +106,11 @@ def get_access_token_from_refresh_token(refresh_token):
         createAPIErrorLog(error)
         return error
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def revoke_access_token(access_token):
     try:
         #access token  and refresh token which created along will be revoked
+        lang = frappe.request.headers.get('Lang')
         url = frappe.utils.get_url() + "/api/method/frappe.integrations.oauth2.revoke_token"
         payload= f'token={access_token}'
         headers = {
@@ -111,7 +119,7 @@ def revoke_access_token(access_token):
         response = requests.request("POST", url, headers=headers, data=payload)
         response_text = json.loads(response.text)
         if response.status_code != 200:
-            frappe.throw(response_text.get("_server_messages"))
+            frappe.throw(_(response_text.get("_server_messages"), lang = lang))
         else:
             return response_text
     except Exception:
@@ -123,6 +131,7 @@ def revoke_access_token(access_token):
 def reset_password(username, old_password, new_password):
     """ Function to reset the password of the User with a new password """
     try:
+        lang = frappe.request.headers.get('Lang')
         from frappe.core.doctype.user.user import test_password_strength, handle_password_test_fail
         # validate username and password
         check_password(username, old_password, delete_tracker_cache=False)
@@ -134,17 +143,18 @@ def reset_password(username, old_password, new_password):
                 handle_password_test_fail(testing)
             # update new password of user to database
             update_password(username, new_password,logout_all_sessions=True)
-            return "Reset Password Successfully"
+            return _("Reset Password Successfully", lang = lang)
         else:
-            frappe.throw("Please Provide New Password")
+            frappe.throw(_("Please Provide New Password", lang = lang))
     except Exception:
         error = frappe.get_traceback()
         createAPIErrorLog(error)
         return error
 
 @frappe.whitelist(allow_guest=True)
-def forget_password(email_id):
+def forgot_password(email_id):
     """ The user password will be updated with a random password and send to the user's registered emailID """
+    lang = frappe.request.headers.get('Lang')
     if frappe.db.exists('User',{ "email":email_id }):
         from uuid import uuid4
         password = uuid4().hex[:8]
@@ -153,4 +163,4 @@ def forget_password(email_id):
         message_content = f"Your Password has been successfully reset <br><br>Your new Password : {password} <br>Once you successfully logged in please reset your Password. <br><br>Please let us know if you did not make this request."
         frappe.sendmail(recipients=email_id, subject="Password Reset", message= message_content)
     else:
-        return "invalid email_id"      
+        return _("Invalid email_id", lang = lang)

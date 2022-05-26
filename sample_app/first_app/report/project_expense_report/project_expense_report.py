@@ -10,60 +10,83 @@ def execute(filters=None):
 	columns, data = [], []
 	columns = get_columns(filters)
 	
-	conditions = get_conditions(filters)
-	#returning all je account child table data accoridng to project chosen and Expense account and Date
-	je_data = frappe.db.sql("""select 
-								jea.account,jea.debit_in_account_currency,jea.credit_in_account_currency 
-								from 
-								`tabJournal Entry Account` jea , `tabJournal Entry` je
-								where
-								jea.parent = je.name  and
-								jea.account in (select name from `tabAccount` where root_type='Expense') 
-								%s""" %conditions, as_dict=1)
-								
+	conditions, filters = get_conditions(filters)
+	# get account list of Expense Account
+	account_list = frappe.db.get_list('Account',
+		filters = {
+			'root_type': 'Expense',
+			'is_group': 0
+		},
+		fields = ['name', 'account_number', 'account_name']
+	)
 
-	for je_row in je_data:
-		row_dict ={
-			"account_number": frappe.db.get_value("Account",je_row.get("account"),"account_number"),
-			"account_name":frappe.db.get_value("Account",je_row.get("account"),"account_name"),
-			"amount":je_row.get("debit_in_account_currency")
-		}
-		data.append(row_dict)
+	for account in account_list:
+		amount = 0
+		# get account total amount by debit amount minus credit amount from gl Entry
+		gl_data = frappe.db.sql("""select account, (sum(debit) - sum(credit)) as amount
+			from `tabGL Entry`
+			where docstatus = 1 and is_cancelled != 1
+				and account = '{0}' {1};""".format(account.get("name"),conditions),filters, as_dict=1)
+		if gl_data:
+			amount = gl_data[0].get("amount")
+		
+		if filters.get("show_zero_values"):
+			# ignore amount only with none value
+			if amount is not None:
+				data.append({
+					"account": account.get("name"),
+					"account_number": account.get("account_number"),
+					"account_name": account.get("account_name"),
+					"amount": amount
+				})
+		else:
+			# ignore amount with zero and none values
+			if amount:
+				data.append({
+					"account": account.get("name"),
+					"account_number": account.get("account_number"),
+					"account_name": account.get("account_name"),
+					"amount": amount
+				})
 	return columns, data
 
 def get_columns(filters):
-	columns = []
-	columns.extend( 
-		[
+	columns = [
 		{
-		"fieldname": "account_number",
-		"label": _("Account #"),
-		"fieldtype": "Data",
-		"width": 120
-		}, 
+			"fieldname": "account",
+			"label": _("Account"),
+			"fieldtype": "Link",
+			"options": "Account",
+			"width": 350
+		},
+		{
+			"fieldname": "account_number",
+			"label": _("Account #"),
+			"fieldtype": "Data",
+			"width": 120
+		},
 		{
 			"fieldname": "account_name",
 			"label": _("Account Name"),
-			"fieldtype": "Link",
-			"options": "Account",
-			"width": 200
+			"fieldtype": "Data",
+			"width": 300
 		},
 		{
 			"fieldname": "amount",
 			"label": _("Amount ({0})").format(get_company_currency(get_default_company())),
 			"fieldtype": "Float",
-			"width": 120
+			"width": 150
 		}
-		]
-	)
+	]
 	return columns
 
 def get_conditions(filters):
-	conditions=""
+	conditions = ""
 	if filters.get("from_date"):
-		conditions += 'and je.posting_date >= %s'  % frappe.db.escape(filters.get("from_date"), percent=False)
+		conditions += 'and posting_date >= %s' % frappe.db.escape(filters.get("from_date"), percent=False)
 	if filters.get("to_date"):
-		conditions +='and je.posting_date <= %s' % frappe.db.escape(filters.get("to_date"), percent=False)
+		conditions += 'and posting_date <= %s' % frappe.db.escape(filters.get("to_date"), percent=False)
 	if filters.get("project"):
-		conditions +='and jea.project = %s' % frappe.db.escape(filters.get("project"), percent=False)
-	return conditions
+		filters.project = frappe.parse_json(filters.get('project'))
+		conditions += ' and project in %(project)s'
+	return conditions, filters

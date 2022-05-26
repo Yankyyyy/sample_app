@@ -9,13 +9,13 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2021-12-16 12:15:31.653507",
+ "modified": "2022-04-01 10:34:11.705613",
  "modified_by": "Administrator",
  "module": "Leader Group",
  "name": "Project Expense Report",
  "owner": "Administrator",
  "prepared_report": 0,
- "ref_doctype": "Journal Entry",
+ "ref_doctype": "GL Entry",
  "report_name": "Project Expense Report",
  "report_type": "Script Report",
  "roles": [
@@ -27,9 +27,6 @@
   },
   {
    "role": "Accounts Manager"
-  },
-  {
-   "role": "Employee Self Service"
   }
  ]
 }

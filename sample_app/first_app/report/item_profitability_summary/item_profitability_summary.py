@@ -3,6 +3,8 @@
 
 import frappe
 from frappe import _
+from leadergroup.leader_group.report.item_profitabilty_detail___sales_register.item_profitabilty_detail___sales_register import get_valuation_rate
+from erpnext.accounts.report.item_wise_sales_register.item_wise_sales_register import get_delivery_notes_against_sales_order
 
 def execute(filters=None):
 	columns = get_columns()
@@ -12,8 +14,7 @@ def execute(filters=None):
 				fields=["item_code",
 						"item_name",
 						"description",
-						"item_group",
-      					"valuation_rate"])
+						"item_group"])
 	
 	conditions = get_conditions(filters)
 
@@ -27,19 +28,42 @@ def execute(filters=None):
 				`tabSales Invoice Item`.name, `tabSales Invoice Item`.parent,
 				`tabSales Invoice Item`.item_code,`tabSales Invoice Item`.base_net_amount,
 				`tabSales Invoice Item`.price_list_rate, `tabSales Invoice Item`.qty,
-				`tabSales Invoice Item`.modified
+				`tabSales Invoice Item`.modified, `tabSales Invoice`.project,
+				`tabSales Invoice`.posting_date, `tabSales Invoice Item`.delivery_note,
+				`tabSales Invoice Item`.so_detail, `tabSales Invoice`.update_stock
 			from `tabSales Invoice`, `tabSales Invoice Item`
 			where `tabSales Invoice`.name = `tabSales Invoice Item`.parent
 				and `tabSales Invoice`.docstatus = 1 and `tabSales Invoice Item`.item_code = '{0}' {1}
 			""".format(item.item_code, conditions), filters, as_dict=1)
 		
+		so_dn_map = get_delivery_notes_against_sales_order(sales_invoice_data)
+		
 		for sales_data in sales_invoice_data:
+			unit_price = 0
+			delivery_note = None
+			if sales_data.delivery_note:
+				delivery_note = sales_data.delivery_note
+			elif sales_data.so_detail:
+				delivery_note = ", ".join(so_dn_map.get(sales_data.so_detail, []))
+
+			if not delivery_note and sales_data.update_stock:
+				delivery_note = sales_data.parent
+
+			if sales_data.delivery_note:
+				unit_price = get_valuation_rate(sales_data.get("item_code"), sales_data)
+				invoice_list = """select incoming_rate
+					from `tabDelivery Note Item` DNI 
+						inner join `tabDelivery Note` DN on DN.name = DNI.parent
+					where DN.name = '{0}' 
+						-- and DN.is_return =1 
+						and DNI.item_code = '{1}'
+					""".format(sales_data.delivery_note, sales_data.item_code)
+				invoice_list = frappe.db.sql(invoice_list, as_dict=1)
+
+				if invoice_list:
+					unit_price = invoice_list[0].get("incoming_rate")
 			quantity += sales_data.qty
 			base_net_amount += sales_data.base_net_amount
-			if item.valuation_rate:
-				unit_price = item.valuation_rate
-			else:
-				unit_price = get_last_purchase_rate(sales_data.modified, item.item_code)
 			total_cost += unit_price * sales_data.qty
 		item["qty"] = quantity
 		item["total_sold_value"] = base_net_amount
@@ -89,19 +113,19 @@ def get_columns():
 		{
 			"fieldname": "total_sold_value",
 			"label": _("Total Sold Value"),
-			"fieldtype": "Float",
+			"fieldtype": "Currency",
 			"width": 150
 		},
 		{
 			"fieldname": "total_cost",
 			"label": _("Total Cost of Item"),
-			"fieldtype": "Float",
+			"fieldtype": "Currency",
 			"width": 150
 		},
 		{
 			"fieldname": "profit",
 			"label": _("Profit"),
-			"fieldtype": "Float",
+			"fieldtype": "Currency",
 			"width": 150
 		}
 	]
@@ -132,17 +156,3 @@ def get_conditions(filters):
 		conditions +=  """and ifnull(`tabSales Invoice Item`.item_group, '') = %(item_group)s"""
 
 	return conditions
-
-def get_last_purchase_rate(date, item_code):
-	condition = ''
-	if date:
-		condition += " AND date(posting_date) <= '%s'" % (date)
-
-	last_purchase_rate = frappe.db.sql("""
-		select (a.base_rate / a.conversion_factor)
-		from `tabPurchase Invoice Item` a, `tabPurchase Invoice` b
-		where a.item_code = %s and a.docstatus=1
-		{0}
-		order by b.posting_date desc limit 1""".format(condition), item_code)
-
-	return float(last_purchase_rate[0][0]) if last_purchase_rate else 0.0

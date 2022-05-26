@@ -3,19 +3,15 @@
 
 import frappe
 from frappe import _
-from erpnext.erpnext.accounts.report.item_wise_sales_register.item_wise_sales_register import *
+from erpnext.accounts.report.item_wise_sales_register.item_wise_sales_register import *
 
 def execute(filters=None):
 	return execute_one(filters)
 
 def execute_one(filters=None, additional_table_columns=None, additional_query_columns=None):
 	if not filters: filters = {}
-	additional_table_columnss = [
-		dict(fieldtype='Data', label='Unit Cost', fieldname="unit_cost", width=120),
-		dict(fieldtype='Data', label='Total Cost', fieldname="total_cost", width=120),
-		dict(fieldtype='Data', label='Profit', fieldname="profit", width=120)
-	]
-	columns = get_columns(additional_table_columnss, filters)
+
+	columns = set_columns(additional_table_columns, filters)
 
 	company_currency = frappe.get_cached_value('Company',  filters.get('company'),  'default_currency')
 
@@ -40,17 +36,10 @@ def execute_one(filters=None, additional_table_columns=None, additional_query_co
 	for d in item_list:
 		customer_record = customer_details.get(d.customer)
 		item_record = item_details.get(d.item_code)
-		item_val_rate = frappe.get_doc("Item", {"item_code" : d.item_code},["valuation_rate"])
-		if item_val_rate.valuation_rate:
-			unit_cost = item_val_rate.valuation_rate
-		else:
-			unit_cost = get_last_purchase_rate(filters, d.item_code, d)
-		total_cost = unit_cost * d.qty
-
-		if total_cost == 0 and d.base_net_amount ==0:
-			continue
 		
 		delivery_note = None
+		total_cost = 0
+		unit_cost = 0
 		if d.delivery_note:
 			delivery_note = d.delivery_note
 		elif d.so_detail:
@@ -58,6 +47,26 @@ def execute_one(filters=None, additional_table_columns=None, additional_query_co
 
 		if not delivery_note and d.update_stock:
 			delivery_note = d.parent
+
+		if d.delivery_note:
+			unit_cost = get_valuation_rate(d.item_code, d)
+			total_cost = unit_cost * d.qty
+
+			invoice_list = """select incoming_rate
+				from `tabDelivery Note Item` DNI 
+					inner join `tabDelivery Note` DN on DN.name = DNI.parent
+				where DN.name = '{0}' 
+					-- and DN.is_return =1 
+					and DNI.item_code = '{1}'
+				""".format(d.delivery_note, d.item_code)
+			invoice_list = frappe.db.sql(invoice_list, as_dict=1)
+
+			if invoice_list:
+				unit_cost = invoice_list[0].get("incoming_rate")
+				total_cost = unit_cost * d.qty
+		
+		if total_cost == 0 and d.base_net_amount ==0:
+			continue
 
 		row = {
 			'item_code': d.item_code,
@@ -140,23 +149,257 @@ def execute_one(filters=None, additional_table_columns=None, additional_query_co
 
 	return columns, data, None, None, None, skip_total_row
 
+def get_valuation_rate(item_code, row):
+	valuation_rate = 0
+	if frappe.db.exists('Product Bundle', item_code):
+		bundle_item = frappe.get_all(
+			'Product Bundle Item',
+			filters = {
+				'parent': item_code
+			},
+			fields = ['item_code', 'qty']
+		)
+		for item in bundle_item:
+			valuation_rate += get_item_valuation_rate(item.get("item_code"), row) * item.get("qty")
+	else:
+		valuation_rate += get_item_valuation_rate(item_code, row)
+	return valuation_rate
+
+def get_item_valuation_rate(item_code, row):
+	item_valuation_rate = 0
+	condition = "AND sle.posting_date <= '%s'" % (row.posting_date)
+	if row.project:
+		condition += " AND sle.project=%s" % (frappe.db.escape(row.project))
+
+	valuation_rate = frappe.db.sql("""select
+			valuation_rate
+		from
+			`tabStock Ledger Entry` sle
+		where
+			sle.item_code = %s and sle.docstatus=1
+			{0}
+		order by sle.modified desc limit 1""".format(condition), item_code)
+
+	if valuation_rate:
+		item_valuation_rate = flt(valuation_rate[0][0])
+	else:
+		item_valuation_rate = frappe.db.get_value("Item", item_code, "valuation_rate")
+	return item_valuation_rate
 
 
-def get_last_purchase_rate(filters, item_code, row):
-		condition = ''
-		if row.project:
-			condition += " AND a.project=%s" % (frappe.db.escape(row.project))
-		elif row.cost_center:
-			condition += " AND a.cost_center=%s" % (frappe.db.escape(row.cost_center))
-		if filters.to_date:
-			condition += " AND modified <='%s'" % (filters.to_date)
+def set_columns(additional_table_columns, filters):
+	columns = []
 
-		last_purchase_rate = frappe.db.sql("""
-		select (a.base_rate / a.conversion_factor)
-		from `tabPurchase Invoice Item` a
-		where a.item_code = %s and a.docstatus=1
-		{0}
-		order by a.modified desc limit 1""".format(condition), item_code)
+	if filters.get('group_by') != ('Item'):
+		columns.extend(
+			[
+				{
+					'label': _('Item Code'),
+					'fieldname': 'item_code',
+					'fieldtype': 'Link',
+					'options': 'Item',
+					'width': 120
+				},
+				{
+					'label': _('Item Name'),
+					'fieldname': 'item_name',
+					'fieldtype': 'Data',
+					'width': 120
+				}
+			]
+		)
 
-		return flt(last_purchase_rate[0][0]) if last_purchase_rate else 0
+	if filters.get('group_by') not in ('Item', 'Item Group'):
+		columns.extend([
+			{
+				'label': _('Item Group'),
+				'fieldname': 'item_group',
+				'fieldtype': 'Link',
+				'options': 'Item Group',
+				'width': 120
+			}
+		])
 
+	columns.extend([
+		{
+			'label': _('Description'),
+			'fieldname': 'description',
+			'fieldtype': 'Data',
+			'width': 150
+		},
+		{
+			'label': _('Invoice'),
+			'fieldname': 'invoice',
+			'fieldtype': 'Link',
+			'options': 'Sales Invoice',
+			'width': 120
+		},
+		{
+			'label': _('Posting Date'),
+			'fieldname': 'posting_date',
+			'fieldtype': 'Date',
+			'width': 120
+		}
+	])
+
+	if filters.get('group_by') != 'Customer':
+		columns.extend([
+			{
+				'label': _('Customer Group'),
+				'fieldname': 'customer_group',
+				'fieldtype': 'Link',
+				'options': 'Customer Group',
+				'width': 120
+			}
+		])
+
+	if filters.get('group_by') not in ('Customer', 'Customer Group'):
+		columns.extend([
+			{
+				'label': _('Customer'),
+				'fieldname': 'customer',
+				'fieldtype': 'Link',
+				'options': 'Customer',
+				'width': 120
+			},
+			{
+				'label': _('Customer Name'),
+				'fieldname': 'customer_name',
+				'fieldtype': 'Data',
+				'width': 120
+			}
+		])
+
+	if additional_table_columns:
+		columns += additional_table_columns
+
+	columns += [
+		{
+			'label': _('Receivable Account'),
+			'fieldname': 'debit_to',
+			'fieldtype': 'Link',
+			'options': 'Account',
+			'width': 80
+		},
+		{
+			'label': _('Mode Of Payment'),
+			'fieldname': 'mode_of_payment',
+			'fieldtype': 'Data',
+			'width': 120
+		}
+	]
+
+	if filters.get('group_by') != 'Territory':
+		columns.extend([
+			{
+				'label': _('Territory'),
+				'fieldname': 'territory',
+				'fieldtype': 'Link',
+				'options': 'Territory',
+				'width': 80
+			}
+		])
+
+
+	columns += [
+		{
+			'label': _('Project'),
+			'fieldname': 'project',
+			'fieldtype': 'Link',
+			'options': 'Project',
+			'width': 80
+		},
+		{
+			'label': _('Company'),
+			'fieldname': 'company',
+			'fieldtype': 'Link',
+			'options': 'Company',
+			'width': 80
+		},
+		{
+			'label': _('Sales Order'),
+			'fieldname': 'sales_order',
+			'fieldtype': 'Link',
+			'options': 'Sales Order',
+			'width': 100
+		},
+		{
+			'label': _("Delivery Note"),
+			'fieldname': 'delivery_note',
+			'fieldtype': 'Link',
+			'options': 'Delivery Note',
+			'width': 100
+		},
+		{
+			'label': _('Income Account'),
+			'fieldname': 'income_account',
+			'fieldtype': 'Link',
+			'options': 'Account',
+			'width': 100
+		},
+		{
+			'label': _("Cost Center"),
+			'fieldname': 'cost_center',
+			'fieldtype': 'Link',
+			'options': 'Cost Center',
+			'width': 100
+		},
+		{
+			'label': _('Stock Qty'),
+			'fieldname': 'stock_qty',
+			'fieldtype': 'Float',
+			'width': 100
+		},
+		{
+			'label': _('Stock UOM'),
+			'fieldname': 'stock_uom',
+			'fieldtype': 'Link',
+			'options': 'UOM',
+			'width': 100
+		},
+		{
+			'label': _('Rate'),
+			'fieldname': 'rate',
+			'fieldtype': 'Float',
+			'options': 'currency',
+			'width': 100
+		},
+		{
+			'label': _('Amount'),
+			'fieldname': 'amount',
+			'fieldtype': 'Currency',
+			'options': 'currency',
+			'width': 100
+		},
+		{
+			'label': _('Unit Cost'),
+			'fieldname': 'unit_cost',
+			'fieldtype': 'Currency',
+			'options': 'currency',
+			'width': 100
+		},
+		{
+			'label': _('Total Cost'),
+			'fieldname': 'total_cost',
+			'fieldtype': 'Currency',
+			'options': 'currency',
+			'width': 100
+		},
+		{
+			'label': _('Profit'),
+			'fieldname': 'profit',
+			'fieldtype': 'Currency',
+			'options': 'currency',
+			'width': 100
+		}
+	]
+
+	if filters.get('group_by'):
+		columns.append({
+			'label': _('% Of Grand Total'),
+			'fieldname': 'percent_gt',
+			'fieldtype': 'Float',
+			'width': 80
+		})
+
+	return columns

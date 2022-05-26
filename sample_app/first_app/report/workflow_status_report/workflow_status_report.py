@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+from frappe.utils import formatdate
 
 def execute(filters=None):
     columns, data = [], []
@@ -23,6 +24,7 @@ def execute(filters=None):
                 ],
             order_by="creation")
     for d in data:
+        d['creation'] = formatdate(d['creation'])
         d['owner'] =  frappe.get_value('User', d.owner, 'full_name')
         workflow = frappe.get_value('Workflow', {'document_type': filters["reference_doctype"], 'is_active': 1}, 'name')
         transition = frappe.get_value('Workflow Transition', {'parent': workflow, 'next_state': d.content}, ['state', 'action'], as_dict=1)
@@ -41,14 +43,14 @@ def get_columns():
         },
         {
             "fieldname": "owner",
-            "label": _("Updated By"),
+            "label": _("Approved By"),
             "fieldtype": "Data",
             "width": 200
         },
         {
             "fieldname": "creation",
-            "label": _("Updated On"),
-            "fieldtype": "Date",
+            "label": _("Approved On"),
+            "fieldtype": "DateTime",
             "width": 180
         },
         {

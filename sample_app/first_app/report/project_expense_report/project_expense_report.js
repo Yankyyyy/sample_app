@@ -6,21 +6,58 @@
 frappe.query_reports["Project Expense Report"] = {
 	"filters": [
 		{
-			"fieldname": "project",
+            "fieldname": "company",
+            "label": __("Company"),
+            "fieldtype": "Link",
+            "options": "Company",
+            "default": frappe.defaults.get_user_default("Company") || frappe.defaults.get_global_default("Company"),
+            "reqd": 1,
+            "hidden": 1
+        },
+		{
+			"fieldname":"project",
 			"label": __("Project"),
-			"fieldtype": "Link",
-			"options": "Project",
-			"reqd":1
+			"fieldtype": "MultiSelectList",
+			get_data: function(txt) {
+				return frappe.db.get_link_options('Project', txt, {
+					company: frappe.query_report.get_filter_value("company")
+				});
+			}
 		},
 		{
-			"fieldname": "from_date",
-			"label": __("From Date"),
-			"fieldtype": "Date"
-		},
+            "fieldname": "from_date",
+            "label": __("From Date"),
+            "fieldtype": "Date",
+            "default": frappe.datetime.add_months(frappe.datetime.get_today(), -1),
+            "reqd": 1
+        },
+        {
+            "fieldname": "to_date",
+            "label": __("To Date"),
+            "fieldtype": "Date",
+            "default": frappe.datetime.get_today(),
+            "reqd": 1
+        },
 		{
-			"fieldname": "to_date",
-			"label": __("To Date"),
-			"fieldtype": "Date"
+			"fieldname": "show_zero_values",
+			"label": __("Show Zero Values"),
+			"fieldtype": "Check"
 		},
-	]
+        {
+            "fieldname": "printed_on",
+            "label": __("Printed On"),
+            "fieldtype": "Data",
+            "default": moment(frappe.datetime.now_datetime()).format("MM-DD-YYYY HH:mm:ss"),
+            "read_only": 1
+        }
+	],
+    
+    onload: function(report) {
+        const views_menu = report.page.add_custom_button_group(__('General Ledger Report'));
+
+        report.page.add_custom_menu_item(views_menu, __("General Ledger"), function() {
+            var filters = report.get_values();
+            frappe.set_route('query-report', 'General Ledger', filters);
+        });
+    }
 };

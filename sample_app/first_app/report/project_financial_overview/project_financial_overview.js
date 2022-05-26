@@ -17,6 +17,12 @@ frappe.query_reports["Project Financial Overview"] = {
 			"options": "Project"
 		},
 		{
+			"fieldname": "name",
+			"label": __("Project Type"),
+			"fieldtype": "Link",
+			"options": "Project Type"
+		},
+		{
 			"fieldname": "date",
 			"label": __("Printed On"),
 			"fieldtype": "Data",
