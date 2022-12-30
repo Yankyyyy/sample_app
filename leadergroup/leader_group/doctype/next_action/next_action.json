@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2021-12-02 09:16:53.929171",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "owner",
+  "owner_name",
+  "action_date",
+  "status",
+  "progress",
+  "expected_date",
+  "completed_date",
+  "column_break_7",
+  "action_type",
+  "action"
+ ],
+ "fields": [
+  {
+   "fieldname": "owner",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Owner ",
+   "options": "User"
+  },
+  {
+   "fetch_from": "owner.full_name",
+   "fieldname": "owner_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Owner Name "
+  },
+  {
+   "fieldname": "action_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Action Date"
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Action "
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status ",
+   "options": "\nOpen\nIn Progress\nClosed"
+  },
+  {
+   "fieldname": "expected_date",
+   "fieldtype": "Date",
+   "label": "Expected Date"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "completed_date",
+   "fieldtype": "Date",
+   "label": "Completed Date"
+  },
+  {
+   "fieldname": "action_type",
+   "fieldtype": "Select",
+   "label": "Action type",
+   "options": "\nCustomer \u2013 Contact\nCustomer - Feedback\nRFP \u2013 Preparation Technical\nRFP \u2013 Preparation Costing\nRFP \u2013 Update\nRFP \u2013 Review\nRFP \u2013 Approval\nRFP \u2013 Submission\nProposal \u2013 Preparation Costing\nProposal \u2013 Update\nProposal \u2013 Review\nProposal \u2013 Approval\nProposal \u2013 Submission\nReporting\nPresentation\nGeneral Action\nMeeting\nResearch"
+  },
+  {
+   "fieldname": "progress",
+   "fieldtype": "Percent",
+   "label": "Progress"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-03-03 08:34:44.446667",
+ "modified_by": "Administrator",
+ "module": "Leader Group",
+ "name": "Next Action",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

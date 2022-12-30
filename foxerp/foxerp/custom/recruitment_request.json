@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Recruitment Request",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-09-04 21:11:34.689163",
+   "default_value": null,
+   "doc_type": "Recruitment Request",
+   "docstatus": 0,
+   "doctype_or_field": "DocType",
+   "field_name": null,
+   "idx": 0,
+   "modified": "2022-09-04 21:11:34.689163",
+   "modified_by": "Administrator",
+   "name": "Recruitment Request-main-default_print_format",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "default_print_format",
+   "property_type": "Data",
+   "row_name": null,
+   "value": "Recruitment Request Form"
+  }
+ ],
+ "sync_on_migrate": 1
+}

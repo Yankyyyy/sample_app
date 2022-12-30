@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "creation": "2022-02-18 08:35:39.885939",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "usage_info_section",
+  "allowed_user",
+  "column_break_3",
+  "active_user",
+  "license_info_section",
+  "start_date",
+  "expiry_alert_before_in_days",
+  "column_break_7",
+  "end_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "usage_info_section",
+   "fieldtype": "Section Break",
+   "label": "Usage Info"
+  },
+  {
+   "fieldname": "allowed_user",
+   "fieldtype": "Int",
+   "label": "Allowed User"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "active_user",
+   "fieldtype": "Read Only",
+   "label": "Active User"
+  },
+  {
+   "fieldname": "license_info_section",
+   "fieldtype": "Section Break",
+   "label": "License Info"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expiry_alert_before_in_days",
+   "fieldtype": "Int",
+   "label": "Expiry Alert Before (in Days)"
+  }
+ ],
+ "in_create": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-02-22 11:14:36.221510",
+ "modified_by": "Administrator",
+ "module": "Foxerp",
+ "name": "License and Usage Info",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  }
+ ],
+ "read_only": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}

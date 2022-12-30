@@ -1,0 +1,8 @@
+{
+    "css/leadergroup.css": [
+        "public/css/leadergroup.css"
+    ],
+	"css/leadergroup-web.css": [
+		"public/scss/website.scss"
+	]
+}

@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "creation": "2021-12-03 10:15:40.870125",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "code",
+  "maturity_level",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "code",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Code",
+   "options": "0\n1\n2\n3"
+  },
+  {
+   "fieldname": "maturity_level",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Maturity Level",
+   "options": "Not Ready\nTo be updated\nIn Progress\nReady",
+   "read_only": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2021-12-13 07:50:26.056167",
+ "modified_by": "Administrator",
+ "module": "Leader Group",
+ "name": "Solution Offerings",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,15 @@
+from __future__ import unicode_literals
+import frappe
+from frappe import _
+from frappe.model.workflow import get_workflow, get_workflow_name
+
+@frappe.whitelist()
+def update_return_status_in_je(doc, method):
+    if get_workflow_name(doc.doctype):
+        workflow = get_workflow(doc.doctype)
+    else:
+        workflow = ''
+    if doc.reversal_of and doc._action == "submit"  :
+        frappe.db.set_value("Journal Entry", {"name": doc.reversal_of}, workflow.workflow_state_field, "Return Issued")
+    if doc.reversal_of and doc._action == "cancel"  :
+        frappe.db.set_value("Journal Entry", {"name": doc.reversal_of}, workflow.workflow_state_field, "Approved" )

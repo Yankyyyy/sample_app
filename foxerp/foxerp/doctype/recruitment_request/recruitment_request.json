@@ -1,0 +1,462 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "RR-.YYYY.-.#####",
+ "creation": "2022-08-16 14:02:03.413485",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "job_applicant",
+  "applicant_name",
+  "country",
+  "amended_from",
+  "column_break_4",
+  "job_reference_id",
+  "new_employee",
+  "replacement",
+  "replaced_emp_name_salary",
+  "job_info_section",
+  "job_title",
+  "product_name",
+  "department",
+  "location_type",
+  "location",
+  "column_break_15",
+  "line_manager",
+  "department_head",
+  "expected_joining_date",
+  "hiring_type_section",
+  "hiring_type",
+  "column_break_21",
+  "name_of_consultancy",
+  "column_break_23",
+  "one_time_cost",
+  "salary_details_section",
+  "currency",
+  "base_yearly_salary",
+  "base_monthly_salary",
+  "contract_type",
+  "column_break_27",
+  "conversion_rate",
+  "yearly_salary",
+  "monthly_salary",
+  "other_requirements_section",
+  "medical_insurance",
+  "office",
+  "column_break_39",
+  "email",
+  "mobile",
+  "column_break_42",
+  "pc_accessories",
+  "laptop_accessories",
+  "approvals_section",
+  "requester",
+  "requester_name",
+  "product_manager",
+  "product_manager_name",
+  "hr_head_india",
+  "hr_head_india_name",
+  "column_break_46",
+  "director_leader_it",
+  "director_leader_it_name",
+  "vp_international_business_hr",
+  "vp_international_business_hr_name",
+  "ceo",
+  "ceo_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Recruitment Request",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "job_reference_id",
+   "fieldtype": "Data",
+   "label": "Job Reference ID"
+  },
+  {
+   "default": "0",
+   "fieldname": "new_employee",
+   "fieldtype": "Check",
+   "label": "New Employee"
+  },
+  {
+   "default": "0",
+   "fieldname": "replacement",
+   "fieldtype": "Check",
+   "label": "Replacement"
+  },
+  {
+   "depends_on": "eval: (doc.replacement === 1)",
+   "fieldname": "replaced_emp_name_salary",
+   "fieldtype": "Data",
+   "label": "Replaced Emp Name & Salary"
+  },
+  {
+   "fieldname": "job_info_section",
+   "fieldtype": "Section Break",
+   "label": "Job Info"
+  },
+  {
+   "fetch_from": "job_applicant.designation",
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title"
+  },
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "location_type",
+   "fieldtype": "Select",
+   "label": "Location Type",
+   "options": "\nWFH\nWFO"
+  },
+  {
+   "depends_on": "eval: (doc.location_type === 'WFO')",
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Location"
+  },
+  {
+   "fieldname": "line_manager",
+   "fieldtype": "Link",
+   "label": "Line Manager",
+   "options": "User"
+  },
+  {
+   "fieldname": "department_head",
+   "fieldtype": "Link",
+   "label": "Department Head",
+   "options": "User"
+  },
+  {
+   "fieldname": "expected_joining_date",
+   "fieldtype": "Date",
+   "label": "Expected Joining Date"
+  },
+  {
+   "fieldname": "hiring_type_section",
+   "fieldtype": "Section Break",
+   "label": "Hiring Type"
+  },
+  {
+   "fieldname": "hiring_type",
+   "fieldtype": "Select",
+   "label": "Hiring Type",
+   "options": "\nDirect\nContract\nVia Consultancy"
+  },
+  {
+   "depends_on": "eval: (doc.hiring_type === 'Via Consultancy')",
+   "fieldname": "name_of_consultancy",
+   "fieldtype": "Data",
+   "label": "Name of Consultancy"
+  },
+  {
+   "depends_on": "eval: (doc.hiring_type === 'Via Consultancy')",
+   "fieldname": "one_time_cost",
+   "fieldtype": "Currency",
+   "label": "One Time Cost"
+  },
+  {
+   "fieldname": "salary_details_section",
+   "fieldtype": "Section Break",
+   "label": "Salary Details"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "conversion_rate",
+   "fieldtype": "Float",
+   "label": "Currency Conversion"
+  },
+  {
+   "default": "0",
+   "fieldname": "yearly_salary",
+   "fieldtype": "Currency",
+   "label": "Yearly Salary",
+   "options": "currency"
+  },
+  {
+   "default": "0",
+   "fieldname": "base_yearly_salary",
+   "fieldtype": "Currency",
+   "label": "Yearly Salary (Company Currency)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "default": "0",
+   "fieldname": "monthly_salary",
+   "fieldtype": "Currency",
+   "label": "Monthly Salary",
+   "options": "currency"
+  },
+  {
+   "default": "0",
+   "fieldname": "base_monthly_salary",
+   "fieldtype": "Currency",
+   "label": "Monthly Salary (Company Currency)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "contract_type",
+   "fieldtype": "Select",
+   "label": "Contract Type",
+   "options": "\nPermanent\nFull Time\nContract\nPart Time"
+  },
+  {
+   "fieldname": "other_requirements_section",
+   "fieldtype": "Section Break",
+   "label": "Other Requirements"
+  },
+  {
+   "default": "0",
+   "fieldname": "mobile",
+   "fieldtype": "Check",
+   "label": "Mobile"
+  },
+  {
+   "default": "0",
+   "fieldname": "medical_insurance",
+   "fieldtype": "Check",
+   "label": "Medical Insurance"
+  },
+  {
+   "default": "0",
+   "fieldname": "email",
+   "fieldtype": "Check",
+   "label": "Email"
+  },
+  {
+   "default": "0",
+   "fieldname": "office",
+   "fieldtype": "Check",
+   "label": "Office"
+  },
+  {
+   "default": "0",
+   "fieldname": "pc_accessories",
+   "fieldtype": "Check",
+   "label": "PC & Accessories"
+  },
+  {
+   "default": "0",
+   "fieldname": "laptop_accessories",
+   "fieldtype": "Check",
+   "label": "Laptop & Accessories"
+  },
+  {
+   "fieldname": "approvals_section",
+   "fieldtype": "Section Break",
+   "label": "Approvals"
+  },
+  {
+   "fieldname": "requester",
+   "fieldtype": "Link",
+   "label": "Requester",
+   "options": "User"
+  },
+  {
+   "fetch_from": "requester.full_name",
+   "fieldname": "requester_name",
+   "fieldtype": "Read Only",
+   "label": "Requester Name"
+  },
+  {
+   "fieldname": "product_manager",
+   "fieldtype": "Link",
+   "label": "Product Manager",
+   "options": "User"
+  },
+  {
+   "fetch_from": "product_manager.full_name",
+   "fieldname": "product_manager_name",
+   "fieldtype": "Read Only",
+   "label": "Product Manager Name"
+  },
+  {
+   "fieldname": "hr_head_india",
+   "fieldtype": "Link",
+   "label": "HR Head India",
+   "options": "User"
+  },
+  {
+   "fetch_from": "hr_head_india.full_name",
+   "fieldname": "hr_head_india_name",
+   "fieldtype": "Read Only",
+   "label": "HR Head India Name"
+  },
+  {
+   "fieldname": "director_leader_it",
+   "fieldtype": "Link",
+   "label": "Director - Leader IT",
+   "options": "User"
+  },
+  {
+   "fetch_from": "director_leader_it.full_name",
+   "fieldname": "director_leader_it_name",
+   "fieldtype": "Read Only",
+   "label": "Director - Leader IT Name"
+  },
+  {
+   "fieldname": "vp_international_business_hr",
+   "fieldtype": "Link",
+   "label": "VP International Business & HR",
+   "options": "User"
+  },
+  {
+   "fetch_from": "vp_international_business_hr.full_name",
+   "fieldname": "vp_international_business_hr_name",
+   "fieldtype": "Read Only",
+   "label": "VP International Business & HR Name"
+  },
+  {
+   "fieldname": "ceo",
+   "fieldtype": "Link",
+   "label": "CEO",
+   "options": "User"
+  },
+  {
+   "fetch_from": "ceo.full_name",
+   "fieldname": "ceo_name",
+   "fieldtype": "Read Only",
+   "label": "CEO Name"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_46",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "job_applicant",
+   "fieldtype": "Link",
+   "label": "Job Applicant",
+   "options": "Job Applicant"
+  },
+  {
+   "fetch_from": "job_applicant.applicant_name",
+   "fieldname": "applicant_name",
+   "fieldtype": "Data",
+   "label": "Applicant Name"
+  },
+  {
+   "fetch_from": "job_applicant.country",
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_42",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_39",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-12-14 07:10:29.357540",
+ "modified_by": "Administrator",
+ "module": "Foxerp",
+ "name": "Recruitment Request",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
